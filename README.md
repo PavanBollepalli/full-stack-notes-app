@@ -140,6 +140,13 @@ full-stack-notes-app/
 
 This project is licensed under the MIT License.
 
-## Contact
+## Google OAuth Setup
 
-For questions or support, please contact [your-email@example.com]
+1. Go to the [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select an existing one
+3. Enable the Google+ API
+4. Create OAuth 2.0 credentials
+5. Add your domain to authorized origins (e.g., `http://localhost:5000` for development)
+6. Copy the Client ID and add it to your `.env` file as `GOOGLE_CLIENT_ID`
+
+For the frontend, you'll need to integrate Google Sign-In button properly. Currently, it's a placeholder that needs full OAuth flow implementation.

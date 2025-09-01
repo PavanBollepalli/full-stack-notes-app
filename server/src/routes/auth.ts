@@ -9,6 +9,11 @@ const router = express.Router();
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Send OTP for signup/login
+router.post('/demo', async (req,res)=>{
+  const {email} = req.body;
+  if (!email) return res.status(400).json({ error: 'Email is required' });
+  res.send("I am working fine")
+})
 router.post('/send-otp', async (req, res) => {
   const { email } = req.body;
   if (!email) return res.status(400).json({ error: 'Email is required' });

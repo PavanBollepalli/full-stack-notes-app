@@ -4,31 +4,42 @@ import Auth from './components/Auth';
 import Notes from './components/Notes';
 
 interface Note {
-  id: string;
+  _id: string;
   content: string;
- }
-
-function App() {
+  createdAt: string;
+  updatedAt: string;
+}function App() {
   const [user, setUser] = useState<any>(null);
   const [token, setToken] = useState<string>('');
   const [notes, setNotes] = useState<Note[]>([]);
 
-  const handleAuthSuccess = (user: any, token: string) => {
+  const handleAuthSuccess = async (user: any, token: string) => {
     setUser(user);
     setToken(token);
-    // TODO: Fetch notes from backend
-    setNotes([]);
+    // Fetch notes from backend
+    try {
+      const response = await fetch('http://localhost:5000/api/notes', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setNotes(data);
+      } else {
+        console.error('Failed to fetch notes');
+      }
+    } catch (error) {
+      console.error('Network error');
+    }
   };
 
-  const handleCreateNote = (content: string) => {
-    // TODO: Call backend to create note
-    const newNote = { id: Date.now().toString(), content };
-    setNotes([newNote, ...notes]);
+  const handleCreateNote = (note: any) => {
+    setNotes([note, ...notes]);
   };
 
   const handleDeleteNote = (id: string) => {
-    // TODO: Call backend to delete note
-    setNotes(notes.filter(n => n.id !== id));
+    setNotes(notes.filter(n => n._id !== id));
   };
 
   if (!user) {
@@ -48,7 +59,7 @@ function App() {
         </div>
       </header>
       <main>
-        <Notes notes={notes} onCreate={handleCreateNote} onDelete={handleDeleteNote} />
+        <Notes notes={notes} onCreate={handleCreateNote} onDelete={handleDeleteNote} token={token} />
       </main>
     </div>
   );

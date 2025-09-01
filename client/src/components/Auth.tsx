@@ -13,31 +13,68 @@ const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
   const [loading, setLoading] = useState(false);
 
   // Placeholder for Google login
-  const handleGoogleLogin = () => {
-    // TODO: Integrate Google OAuth
-    alert('Google login not implemented yet');
+  const handleGoogleLogin = async () => {
+    // TODO: Implement Google OAuth flow
+    // For now, simulate with a mock token
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: 'mock-google-token' }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        onAuthSuccess(data.user, data.token);
+      } else {
+        setError(data.error || 'Google login failed');
+      }
+    } catch (error) {
+      setError('Network error');
+    }
   };
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
-    // TODO: Call API to send OTP
-    setTimeout(() => {
-      setStep('otp');
-      setLoading(false);
-    }, 1000);
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setStep('otp');
+      } else {
+        setError(data.error || 'Failed to send OTP');
+      }
+    } catch (error) {
+      setError('Network error');
+    }
+    setLoading(false);
   };
 
   const handleOtpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
-    // TODO: Call API to verify OTP
-    setTimeout(() => {
-      onAuthSuccess({ email }, 'mock-jwt-token');
-      setLoading(false);
-    }, 1000);
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        onAuthSuccess(data.user, data.token);
+      } else {
+        setError(data.error || 'Invalid OTP');
+      }
+    } catch (error) {
+      setError('Network error');
+    }
+    setLoading(false);
   };
 
   return (

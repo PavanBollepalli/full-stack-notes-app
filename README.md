@@ -144,9 +144,26 @@ This project is licensed under the MIT License.
 
 1. Go to the [Google Cloud Console](https://console.cloud.google.com/)
 2. Create a new project or select an existing one
-3. Enable the Google+ API
-4. Create OAuth 2.0 credentials
-5. Add your domain to authorized origins (e.g., `http://localhost:5000` for development)
-6. Copy the Client ID and add it to your `.env` file as `GOOGLE_CLIENT_ID`
+3. Enable the Google+ API:
+   - Go to "APIs & Services" > "Library"
+   - Search for "Google+ API" and enable it
+4. Create OAuth 2.0 credentials:
+   - Go to "APIs & Services" > "Credentials"
+   - Click "Create Credentials" > "OAuth 2.0 Client IDs"
+   - Configure the OAuth consent screen if prompted
+   - Set application type to "Web application"
+   - Add authorized origins: `http://localhost:5000` (for development) and your production domain
+   - Add authorized redirect URIs: `http://localhost:5000/auth/google/callback` (adjust as needed)
+5. Copy the Client ID and add it to your `.env` file as `GOOGLE_CLIENT_ID`
 
-For the frontend, you'll need to integrate Google Sign-In button properly. Currently, it's a placeholder that needs full OAuth flow implementation.
+## Email Setup (Gmail)
+
+1. Use a Gmail account for sending OTP emails
+2. Enable 2-Factor Authentication (2FA) on your Google account
+3. Generate an App Password:
+   - Go to [Google Account Settings](https://myaccount.google.com/)
+   - Security > 2-Step Verification > App passwords
+   - Generate a password for "Mail" and your device
+4. Add to `.env`:
+   - `EMAIL_USER=your-gmail@gmail.com`
+   - `EMAIL_PASS=your-16-character-app-password`

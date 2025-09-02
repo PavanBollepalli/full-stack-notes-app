@@ -78,10 +78,10 @@ const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8 flex flex-col items-center">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-6 sm:p-8 flex flex-col items-center">
         <img src="/logo.png" alt="Logo" className="w-16 h-16 mb-4" />
-        <h2 className="text-2xl font-bold mb-6">{isSignup ? 'Sign Up' : 'Login'}</h2>
+        <h2 className="text-4xl font-bold bg-dark mb-6">{isSignup ? 'Sign Up' : 'Login'}</h2>
         <form onSubmit={step === 'email' ? handleEmailSubmit : handleOtpSubmit} className="w-full flex flex-col gap-4">
           {step === 'email' && (
             <>

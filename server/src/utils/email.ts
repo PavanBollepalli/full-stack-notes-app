@@ -1,10 +1,11 @@
 import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.mailtrap.io',
+  port: 2525,
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    user: process.env.EMAIL_USER || 'your-mailtrap-user',
+    pass: process.env.EMAIL_PASS || 'your-mailtrap-password',
   },
 });
 
@@ -16,5 +17,11 @@ export const sendOTP = async (email: string, otp: string) => {
     text: `Your OTP is: ${otp}. It expires in 10 minutes.`,
   };
 
-  await transporter.sendMail(mailOptions);
+  try {
+    const result = await transporter.sendMail(mailOptions);
+    console.log('Email sent successfully:', result);
+  } catch (error) {
+    console.error('Email sending failed:', error);
+    throw error;
+  }
 };

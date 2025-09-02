@@ -42,20 +42,26 @@ interface Note {
     setNotes(notes.filter(n => n._id !== id));
   };
 
+  const handleLogout = () => {
+    setUser(null);
+    setToken('');
+    setNotes([]);
+  };
+
   if (!user) {
     return <Auth onAuthSuccess={handleAuthSuccess} />;
   }
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <header className="flex items-center justify-between px-6 py-4 bg-white shadow">
-        <div className="flex items-center gap-2">
-          <img src="/logo.png" alt="Logo" className="w-10 h-10" />
-          <span className="text-xl font-bold text-gray-800">Notes App</span>
+      <header className="flex flex-col sm:flex-row items-center justify-between px-4 sm:px-6 py-4 bg-white shadow">
+        <div className="flex items-center gap-2 mb-2 sm:mb-0">
+          <img src="/logo.png" alt="Logo" className="w-8 h-8 sm:w-10 sm:h-10" />
+          <span className="text-lg sm:text-xl font-bold text-gray-800">Notes App</span>
         </div>
-        <div className="user-info text-gray-700 font-medium">
-          Welcome, {user.email || user.name}
-          {/* Add logout button if needed */}
+        <div className="user-info text-gray-700 font-medium flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
+          <span className="text-sm sm:text-base">Welcome, {user.email || user.name}</span>
+          <button onClick={handleLogout} className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition text-sm">Logout</button>
         </div>
       </header>
       <main>

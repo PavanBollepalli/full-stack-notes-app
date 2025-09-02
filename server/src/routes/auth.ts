@@ -8,17 +8,22 @@ import { sendOTP } from '../utils/email';
 const router = express.Router();
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-// Send OTP for signup/login
-router.post('/demo', async (req,res)=>{
-  const {email} = req.body;
-  if (!email) return res.status(400).json({ error: 'Email is required' });
-  res.send("I am working fine")
-})
+// Test email configuration
+router.post('/test-email', async (req, res) => {
+  try {
+    await sendOTP(process.env.EMAIL_USER!, '123456');
+    res.json({ message: 'Test email sent successfully' });
+  } catch (error) {
+    console.error('Test email failed:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    res.status(500).json({ error: 'Test email failed', details: errorMessage });
+  }
+});
 router.post('/send-otp', async (req, res) => {
   const { email } = req.body;
   if (!email) return res.status(400).json({ error: 'Email is required' });
 
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const otp = '123456'; // For testing, use a fixed OTP
   const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
   try {
@@ -30,10 +35,18 @@ router.post('/send-otp', async (req, res) => {
       user.otpExpires = otpExpires;
     }
     await user.save();
-    await sendOTP(email, otp);
-    res.json({ message: 'OTP sent' });
+
+    // For testing: return OTP directly instead of sending email
+    console.log(`Test OTP for ${email}: ${otp}`);
+    res.json({
+      message: 'OTP generated for testing',
+      otp: otp,
+      note: 'Use this OTP to test the verification endpoint'
+    });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to send OTP' });
+    console.error('Error in send-otp:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    res.status(500).json({ error: 'Failed to generate OTP', details: errorMessage });
   }
 });
 
@@ -54,6 +67,7 @@ router.post('/verify-otp', async (req, res) => {
     await user.save();
 
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET!, { expiresIn: '7d' });
+    console.log('JWT_SECRET used for signing:', process.env.JWT_SECRET);
     res.json({ user: { email: user.email, name: user.name }, token });
   } catch (error) {
     res.status(500).json({ error: 'Verification failed' });

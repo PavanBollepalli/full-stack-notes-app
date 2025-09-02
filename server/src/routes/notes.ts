@@ -7,16 +7,29 @@ const router = express.Router();
 // Middleware to verify JWT
 const authenticate = (req: any, res: any, next: any) => {
   const token = req.header('Authorization')?.replace('Bearer ', '');
-  if (!token) return res.status(401).json({ error: 'Access denied' });
+  console.log('Token received:', token ? token.substring(0, 20) + '...' : 'No token');
+  console.log('JWT_SECRET in notes:', process.env.JWT_SECRET);
+
+  if (!token) {
+    console.log('No token provided');
+    return res.status(401).json({ error: 'Access denied' });
+  }
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+    console.log('Token decoded successfully:', decoded);
     req.userId = decoded.userId;
     next();
   } catch (error) {
+    console.error('JWT verification failed:', error);
     res.status(401).json({ error: 'Invalid token' });
   }
 };
+
+// Test JWT secret
+router.get('/test-jwt', (req, res) => {
+  res.json({ jwtSecret: process.env.JWT_SECRET });
+});
 
 // Get all notes for user
 router.get('/', authenticate, async (req: any, res) => {

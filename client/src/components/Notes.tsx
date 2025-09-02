@@ -66,8 +66,8 @@ const Notes: React.FC<NotesProps> = ({ notes, onCreate, onDelete, token }) => {
   };
 
   return (
-    <div className="w-full max-w-xl mx-auto mt-8">
-      <form onSubmit={handleCreate} className="flex gap-2 mb-4">
+    <div className="w-full max-w-xl mx-auto mt-8 px-4 sm:px-6 lg:px-8">
+      <form onSubmit={handleCreate} className="flex flex-col sm:flex-row gap-2 mb-4">
         <input
           type="text"
           placeholder="Write a note..."

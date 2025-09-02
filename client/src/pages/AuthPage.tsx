@@ -40,6 +40,14 @@ const AuthPage: React.FC = () => {
 
   const handleSendOTP = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Client-side email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address');
+      return;
+    }
+
     setLoading(true);
     setError('');
 
@@ -55,6 +63,13 @@ const AuthPage: React.FC = () => {
 
   const handleVerifyOTP = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Client-side OTP validation
+    if (!otp || otp.length !== 6 || !/^\d{6}$/.test(otp)) {
+      setError('Please enter a valid 6-digit OTP');
+      return;
+    }
+
     setLoading(true);
     setError('');
 

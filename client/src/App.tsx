@@ -88,7 +88,7 @@ const AppContent: React.FC = () => {
 function App() {
   return (
     <GoogleOAuthProvider
-      clientId="68943392277-n148k69jkgmbpv5fpeuc1d7hc27ene0t.apps.googleusercontent.com"
+      clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}
       onScriptLoadError={() => console.error('Google OAuth script failed to load')}
       onScriptLoadSuccess={() => console.log('Google OAuth script loaded successfully')}
     >

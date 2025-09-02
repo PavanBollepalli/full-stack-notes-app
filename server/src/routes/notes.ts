@@ -55,6 +55,24 @@ router.post('/', authenticate, async (req: any, res) => {
   }
 });
 
+// Update note
+router.put('/:id', authenticate, async (req: any, res) => {
+  const { content } = req.body;
+  if (!content) return res.status(400).json({ error: 'Content is required' });
+
+  try {
+    const note = await Note.findOneAndUpdate(
+      { _id: req.params.id, userId: req.userId },
+      { content },
+      { new: true }
+    );
+    if (!note) return res.status(404).json({ error: 'Note not found' });
+    res.json(note);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update note' });
+  }
+});
+
 // Delete note
 router.delete('/:id', authenticate, async (req: any, res) => {
   try {

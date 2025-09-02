@@ -23,7 +23,8 @@ router.post('/send-otp', async (req, res) => {
   const { email } = req.body;
   if (!email) return res.status(400).json({ error: 'Email is required' });
 
-  const otp = '123456'; // For testing, use a fixed OTP
+  // Generate a random 6-digit OTP
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
   const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
   try {
@@ -36,17 +37,17 @@ router.post('/send-otp', async (req, res) => {
     }
     await user.save();
 
-    // For testing: return OTP directly instead of sending email
-    console.log(`Test OTP for ${email}: ${otp}`);
+    // Send OTP via email
+    await sendOTP(email, otp);
+
     res.json({
-      message: 'OTP generated for testing',
-      otp: otp,
-      note: 'Use this OTP to test the verification endpoint'
+      message: 'OTP sent to your email successfully',
+      expiresIn: '10 minutes'
     });
   } catch (error) {
     console.error('Error in send-otp:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    res.status(500).json({ error: 'Failed to generate OTP', details: errorMessage });
+    res.status(500).json({ error: 'Failed to send OTP', details: errorMessage });
   }
 });
 

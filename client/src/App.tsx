@@ -1,74 +1,102 @@
-import { useState } from 'react'
-import './App.css'
-import Auth from './components/Auth';
-import Notes from './components/Notes';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import { AuthProvider, useAuth } from './hooks/AuthContext';
+import AuthPage from './pages/AuthPage';
+import SignupPage from './pages/SignupPage';
+import NotesPage from './pages/NotesPage';
+import ProtectedRoute from './components/ProtectedRoute';
+import './App.css';
 
-interface Note {
-  _id: string;
-  content: string;
-  createdAt: string;
-  updatedAt: string;
-}function App() {
-  const [user, setUser] = useState<any>(null);
-  const [token, setToken] = useState<string>('');
-  const [notes, setNotes] = useState<Note[]>([]);
+// Simple test component
+const TestPage = () => (
+  <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
+      <h1 className="text-3xl font-bold text-gray-900 mb-4">Notes App</h1>
+      <p className="text-gray-600 mb-6">Basic React is working!</p>
+      <div className="space-y-4">
+        <button
+          className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+          onClick={() => window.location.href = '/signin'}
+        >
+          Go to Sign In Page
+        </button>
+        <button
+          className="w-full bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 transition-colors"
+          onClick={() => window.location.href = '/signup'}
+        >
+          Go to Sign Up Page
+        </button>
+        <button
+          className="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors"
+          onClick={() => window.location.href = '/notes'}
+        >
+          Go to Notes Page
+        </button>
+      </div>
+    </div>
+  </div>
+);
 
-  const handleAuthSuccess = async (user: any, token: string) => {
-    setUser(user);
-    setToken(token);
-    // Fetch notes from backend
-    try {
-      const response = await fetch('http://localhost:5000/api/notes', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      const data = await response.json();
-      if (response.ok) {
-        setNotes(data);
-      } else {
-        console.error('Failed to fetch notes');
-      }
-    } catch (error) {
-      console.error('Network error');
-    }
-  };
+// App content component that uses auth context
+const AppContent: React.FC = () => {
+  const { user, loading } = useAuth();
 
-  const handleCreateNote = (note: any) => {
-    setNotes([note, ...notes]);
-  };
-
-  const handleDeleteNote = (id: string) => {
-    setNotes(notes.filter(n => n._id !== id));
-  };
-
-  const handleLogout = () => {
-    setUser(null);
-    setToken('');
-    setNotes([]);
-  };
-
-  if (!user) {
-    return <Auth onAuthSuccess={handleAuthSuccess} />;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <header className="flex flex-col sm:flex-row items-center justify-between px-4 sm:px-6 py-4 bg-white shadow">
-        <div className="flex items-center gap-2 mb-2 sm:mb-0">
-          <img src="/logo.png" alt="Logo" className="w-8 h-8 sm:w-10 sm:h-10" />
-          <span className="text-lg sm:text-xl font-bold text-gray-800">Notes App</span>
-        </div>
-        <div className="user-info text-gray-700 font-medium flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
-          <span className="text-sm sm:text-base">Welcome, {user.email || user.name}</span>
-          <button onClick={handleLogout} className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition text-sm">Logout</button>
-        </div>
-      </header>
-      <main>
-        <Notes notes={notes} onCreate={handleCreateNote} onDelete={handleDeleteNote} token={token} />
-      </main>
-    </div>
+    <Router>
+      <div className="App">
+        <Routes>
+          <Route path="/test" element={<TestPage />} />
+          <Route
+            path="/signin"
+            element={user ? <Navigate to="/notes" replace /> : <AuthPage />}
+          />
+          <Route
+            path="/signup"
+            element={user ? <Navigate to="/notes" replace /> : <SignupPage />}
+          />
+          <Route
+            path="/notes"
+            element={
+              <ProtectedRoute>
+                <NotesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/"
+            element={<Navigate to="/signin" replace />}
+          />
+        </Routes>
+      </div>
+    </Router>
+  );
+};
+
+// Main App component with AuthProvider
+function App() {
+  return (
+    <GoogleOAuthProvider
+      clientId="68943392277-n148k69jkgmbpv5fpeuc1d7hc27ene0t.apps.googleusercontent.com"
+      onScriptLoadError={() => console.error('Google OAuth script failed to load')}
+      onScriptLoadSuccess={() => console.log('Google OAuth script loaded successfully')}
+    >
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </GoogleOAuthProvider>
   );
 }
 
-export default App
+export default App;
